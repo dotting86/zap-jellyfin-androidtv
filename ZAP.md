@@ -35,6 +35,58 @@ explicitly rejected.
 | `zap-tv-aggregator-backend-local` | Shared TS library `@dotting86/zap-backend-local` (GitHub Packages): channel registry, XMLTV parser, Rai stream resolution, deep links. Currently 0.2.2. |
 | `zap-tv-aggregator-backend-server` | Fastify/SQLite server deployed on TrueNAS. **Has uncommitted local changes on the original Mac** (XMLTV EPG source, channel data fixes). |
 
+## Data sources (how Zap gets channels, EPG and streams)
+Zap has **no backend of its own for this**: in "local mode" everything is fetched on-device
+from public sources, and the fork should do the same in Kotlin.
+
+1. **Channel registry**: static data, 30 channels with LCN numbering (13 Rai, 10 Mediaset,
+   4 Discovery, 3 WBD). Fields: `id`, `nome`, `logo` (URL), `providerId`, `lcn`, `colore`.
+   Source: `zap-tv-aggregator-backend-local/src/channels.ts`. Port it as Kotlin data.
+   - Wikimedia logo URLs return **403 without a custom `User-Agent`**; send one.
+2. **EPG**: free XMLTV guide `https://www.open-epg.com/files/italy3.xml`.
+   - About 1 MB, 3-day window, around 60 Italian channels. It **302-redirects** to
+     `/app/download.php?file=italy3.xml`, so follow redirects.
+   - Map our channel id to its `<channel id>` with `XMLTV_CHANNEL_MAP` in `backend-local/src/xmltvSource.ts`
+     (e.g. `rai1 -> "Rai 1.it"`; `la7d` has no match). Invert the map for parsing.
+   - Parse only `<programme channel start stop>` with its `<title>` and `<desc>`.
+     Times look like `YYYYMMDDHHMMSS +ZZZZ`.
+   - Cache 6 h in memory. Parse by slicing each `<programme>` with `indexOf`, not a global
+     regex over the whole file (see Lessons).
+   - Parser reference: `backend-local/src/xmltv.ts`.
+3. **Rai live streams** (`providerId == "rai"`; our channel id doubles as the RaiPlay slug):
+   1. `GET https://www.raiplay.it/dirette/<id>.json` with a `User-Agent` returns `video.content_url`, the relinker URL.
+   2. `GET <relinker>&output=64` with headers `Referer: https://www.raiplay.it/dirette/<id>`,
+      `Origin: https://www.raiplay.it` and a desktop `User-Agent` returns XML containing
+      `<url type="content"><![CDATA[<HLS .m3u8>]]>`. Without the Referer it answers 403.
+   3. The HLS URL has a short-lived token: cache it about 5 min and re-resolve.
+
+   Reference: `backend-local/src/raiStream.ts`.
+4. **IPTV playlists** (all non-Rai channels plus extra channels):
+   - Default M3U URLs:
+     - `https://raw.githubusercontent.com/Free-TV/IPTV/master/playlists/playlist_italy.m3u8`
+     - `https://iptv-org.github.io/iptv/countries/it.m3u`
+   - The user can add or remove URLs. Fetch them with a timeout (10 s) and merge.
+   - For each registry channel, match entries by tvg-id or normalized name. Strip tags like `(1080p)`
+     or `[Geo-blocked]` and quality words, then pick the **best quality capped at the device's screen height**.
+   - Channels found in the playlists but not in the registry are added automatically,
+     but **only if Italian** (the tvg-id before `@` ends in `.it`).
+   - **Rai always stays on its official stream** and never switches to IPTV; every other
+     provider prefers IPTV when a match exists.
+   - The user can hide channels. Reference: `frontend/app/src/core/m3u.ts`, `core/iptvChannels.ts`,
+     `core/providers.ts`, `core/deviceResolution.ts`, `state/useIptvSync.ts`.
+5. **Mediaset deep links** (fallback when there is no IPTV match): Zap opens the Mediaset
+   Infinity app (`it.mediaset.infinitytv1`) at
+   `https://mediasetinfinity.mediaset.it/diretta/<slug>`. Reference: `backend-local/src/deeplinkSeed.ts`.
+   - Known bug: backend-local still maps `twenty` to the wrong slug `20mediaset_cLB`.
+   - Deep links leave the app; decide with the user whether Jellyfin Pro keeps them.
+
+### Getting the reference code to the other PC
+The Zap repos are **private**, so the other PC can't clone them without login. **Never copy
+their code into this public fork.** The user copies these folders to the other PC, read-only,
+outside the fork's folder:
+- `zap-tv-aggregator-backend-local/src/`
+- `zap-tv-aggregator-frontend/app/src/` (mainly `core/`, `state/`, `screens/`)
+
 ## Upstream-sync strategy (agreed)
 - All Zap code goes in its **own Gradle module** (e.g. `zap/`). Touch Jellyfin code only at **2-3 minimal hook points**:
   - a menu entry and navigation;
