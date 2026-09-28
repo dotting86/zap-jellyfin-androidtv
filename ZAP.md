@@ -78,7 +78,9 @@ from public sources, and the fork should do the same in Kotlin.
    Infinity app (`it.mediaset.infinitytv1`) at
    `https://mediasetinfinity.mediaset.it/diretta/<slug>`. Reference: `backend-local/src/deeplinkSeed.ts`.
    - Known bug: backend-local still maps `twenty` to the wrong slug `20mediaset_cLB`.
-   - Deep links leave the app; decide with the user whether Jellyfin Pro keeps them.
+   - **Decision (user, 2026-09-28): Jellyfin Pro plays everything inside the app, so no deep links to external apps.**
+     Non-Rai channels play only via IPTV. A registry channel with no IPTV match is simply not playable:
+     hide it or mark it unavailable; never open another app. Do not port `deeplinkSeed.ts`.
 
 ### Getting the reference code to the other PC
 The Zap repos are **private**, so the other PC can't clone them without login. **Never copy
