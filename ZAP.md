@@ -3,8 +3,15 @@
 Read this before working on the fork. It records every decision taken with the user
 (Flavio, writes in Italian) so work can continue on another machine or in another session.
 
+## Separate project: do NOT modify the Zap app
+This fork is a **separate project**. The existing Zap app and its repos
+(`zap-tv-aggregator-frontend`, `-backend-local`, `-backend-server`) must **not be modified**
+for this work; they keep living on their own. Use them only as a **reference** for logic to
+re-implement in Kotlin here. Whether to depend on anything they publish, e.g. the
+`@dotting86/zap-backend-local` data: ask the user first.
+
 ## Goal
-Fork the official Jellyfin Android TV client and build **Zap** into it:
+Fork the official Jellyfin Android TV client and build Zap-like features into it:
 - Italian live TV channels (IPTV + official Rai streams)
 - EPG guide
 - zapping (channel list on the remote's MENU key)
@@ -18,7 +25,7 @@ explicitly rejected.
 | Repo | What it is |
 |---|---|
 | `zap-jellyfin-androidtv` (this repo) | Fork of `jellyfin/jellyfin-androidtv`, Kotlin, GPL-2.0. **Working branch: `zap`**, created from upstream tag `v0.19.10`. |
-| `zap-tv-aggregator-frontend` | The existing Zap app: React Native / Expo (react-native-tvos). Holds the logic to port to Kotlin. |
+| `zap-tv-aggregator-frontend` | The existing Zap app: React Native / Expo (react-native-tvos), a separate project that must **not** be modified from here. Read-only reference for logic to re-implement in Kotlin. |
 | `zap-tv-aggregator-backend-local` | Shared TS library `@dotting86/zap-backend-local` (GitHub Packages): channel registry, XMLTV parser, Rai stream resolution, deep links. Currently 0.2.2. |
 | `zap-tv-aggregator-backend-server` | Fastify/SQLite server deployed on TrueNAS. **Has uncommitted local changes on the original Mac** (XMLTV EPG source, channel data fixes). |
 
@@ -37,6 +44,7 @@ explicitly rejected.
 ## Done so far
 - Forked the repo and created branch `zap` from `v0.19.10`.
 - `app/build.gradle.kts`: release `applicationId` changed to **`com.zap.jellyfin`**, including the search-suggest provider authority (the official app's authority would clash), and the app name set to **"Zap"**. This lets the fork install next to the official Jellyfin app.
+  Open point: the Fire TV would then show two apps named "Zap" (the existing `com.zap.tv` and this fork), so ask the user for this app's name.
 - **Not built yet.** The build needs **JDK 21** (Gradle toolchain `languageVersion=21`); the original Mac only had JDK 17.
 
 ## Release signing
