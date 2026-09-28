@@ -55,6 +55,12 @@ explicitly rejected.
   **NEVER uninstall anything (official Jellyfin, Zap, or any other app) without the user's explicit consent**, asked each time.
 - **Not built yet.** The build needs **JDK 21** (Gradle toolchain `languageVersion=21`); the original Mac only had JDK 17.
 
+## Workflow across machines (user, 2026-09-28)
+- **Other PC:** only for the actual development (writing code), with unlimited tokens.
+- **Original Mac (this one):** everything else, meaning builds, tests on the emulator and Fire TV, signing, commits, pushes and deploys. The keystore, the Fire TV adb access and the emulator live here.
+- The Mac also needs **JDK 21** to build.
+- Code moves between the two machines through the git branch the other PC works on. How exactly it's handed over is up to the user, so ask.
+
 ## Release signing
 - Signing config is read from Gradle properties or env vars: `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `SIGNING_KEY_ALIAS`, `SIGNING_KEY_PASSWORD`.
 - A keystore was generated on the original Mac at `~/.android/zap-jellyfin.keystore`, with its env file at `~/.android/zap-jellyfin-signing.env`. **Neither is in git.**
