@@ -11,7 +11,13 @@ re-implement in Kotlin here. Whether to depend on anything they publish, e.g. th
 `@dotting86/zap-backend-local` data: ask the user first.
 
 ## Goal
-Fork the official Jellyfin Android TV client and build Zap-like features into it:
+Inside this fork we develop **two things** (user, 2026-09-28):
+1. **Zap itself, fully re-implemented in Kotlin**, with all of Zap's features.
+2. **The ad-free YouTube player.**
+
+Jellyfin's own movies and series keep working as usual.
+
+Details:
 - Italian live TV channels (IPTV + official Rai streams)
 - EPG guide
 - zapping (channel list on the remote's MENU key)
