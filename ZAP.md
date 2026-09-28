@@ -50,7 +50,8 @@ explicitly rejected.
 ## Done so far
 - Forked the repo and created branch `zap` from `v0.19.10`.
 - `app/build.gradle.kts`: release `applicationId` changed to **`com.zap.jellyfin`**, including the search-suggest provider authority (the official app's authority would clash), and the app name set to **"Zap"**. This lets the fork install next to the official Jellyfin app.
-  Open point: the Fire TV would then show two apps named "Zap" (the existing `com.zap.tv` and this fork), so ask the user for this app's name.
+  On the Fire TV there must be **only one Zap**: once the fork is ready, the standalone Zap app (`com.zap.tv`) gets **uninstalled from the Fire TV** (ask the user first). Its repos stay untouched. Note that any push to `zap-tv-aggregator-frontend` auto-deploys `com.zap.tv` to the Fire TV again via `deploy-app.yml`.
+  Open point: whether the fork also replaces the official Jellyfin app on the Fire TV. That also decides the final app name.
 - **Not built yet.** The build needs **JDK 21** (Gradle toolchain `languageVersion=21`); the original Mac only had JDK 17.
 
 ## Release signing
