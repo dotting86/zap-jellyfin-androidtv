@@ -59,7 +59,11 @@ explicitly rejected.
 - **Other PC:** only for the actual development (writing code), with unlimited tokens.
 - **Original Mac (this one):** everything else, meaning builds, tests on the emulator and Fire TV, signing, commits, pushes and deploys. The keystore, the Fire TV adb access and the emulator live here.
 - The Mac also needs **JDK 21** to build.
-- Code moves between the two machines through the git branch the other PC works on. How exactly it's handed over is up to the user, so ask.
+- Code moves between the machines **only by manual copy-paste of folders**; the other PC does no git.
+  - **First setup on the other PC:** `git clone https://github.com/dotting86/zap-jellyfin-androidtv.git` (public repo, no login), or copy the folder from the Mac.
+  - **Each hand-over:** the user copies the whole `zap-jellyfin-androidtv` folder from the other PC over the Mac's copy in `~/Desktop/Sviluppi/`, **excluding** `.git`, every `build/` folder, `.gradle`, `.kotlin` and `local.properties`.
+  - On the Mac, `git status` / `git diff` then show exactly what changed. Build and test there, and commit/push only if it works.
+  - **Claude on the other PC must not rely on git** for commits or pushes; they happen on the Mac.
 
 ## Release signing
 - Signing config is read from Gradle properties or env vars: `KEYSTORE_FILE`, `KEYSTORE_PASSWORD`, `SIGNING_KEY_ALIAS`, `SIGNING_KEY_PASSWORD`.
