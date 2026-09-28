@@ -65,7 +65,7 @@ android {
 			resValue("string", "app_search_suggest_intent_data", "content://${ZAP_APPLICATION_ID}.content/intent")
 
 			// Set flavored application name
-			resValue("string", "app_name", "Zap")
+			resValue("string", "app_name", "Jellyfin Pro")
 
 			buildConfigField("boolean", "DEVELOPMENT", "false")
 
