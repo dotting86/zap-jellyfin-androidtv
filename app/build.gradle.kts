@@ -6,6 +6,9 @@ plugins {
 	alias(libs.plugins.aboutlibraries)
 }
 
+// ZAP
+val ZAP_APPLICATION_ID = "com.zap.jellyfin"
+
 android {
 	namespace = "org.jellyfin.androidtv"
 	compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -15,7 +18,8 @@ android {
 		targetSdk = libs.versions.android.targetSdk.get().toInt()
 
 		// Release version
-		applicationId = namespace
+		// ZAP: own application id so the fork installs next to official Jellyfin
+		applicationId = ZAP_APPLICATION_ID
 		versionName = project.getVersionName()
 		versionCode = getVersionCode(versionName!!)
 	}
@@ -56,12 +60,12 @@ android {
 			isMinifyEnabled = false
 
 			// Set package names used in various XML files
-			resValue("string", "app_id", namespace!!)
-			resValue("string", "app_search_suggest_authority", "${namespace}.content")
-			resValue("string", "app_search_suggest_intent_data", "content://${namespace}.content/intent")
+			resValue("string", "app_id", ZAP_APPLICATION_ID)
+			resValue("string", "app_search_suggest_authority", "${ZAP_APPLICATION_ID}.content")
+			resValue("string", "app_search_suggest_intent_data", "content://${ZAP_APPLICATION_ID}.content/intent")
 
 			// Set flavored application name
-			resValue("string", "app_name", "@string/app_name_release")
+			resValue("string", "app_name", "Zap")
 
 			buildConfigField("boolean", "DEVELOPMENT", "false")
 
